@@ -9,14 +9,13 @@ class NegociacaoDao {
     adiciona(negociacao) {
 
         return new Promise((resolve, reject) => {
-
-            let request = this
-                ._connection
-                .transaction([this._store],"readwrite")
+            
+            let request = this._connection
+                .transaction([this._store], 'readwrite')
                 .objectStore(this._store)
                 .add(negociacao);
 
-            request.onsuccess = (e) => {
+            request.onsuccess = e => {
 
                 resolve();
             };
@@ -25,7 +24,9 @@ class NegociacaoDao {
 
                 console.log(e.target.error);
                 reject('Não foi possível adicionar a negociação');
-            };                
+
+            };
+
         });
     }
 
@@ -34,13 +35,14 @@ class NegociacaoDao {
         return new Promise((resolve, reject) => {
 
             let cursor = this._connection
-            .transaction([this._store],"readwrite")
-            .objectStore(this._store)
-            .openCursor();
+                .transaction([this._store], 'readwrite')
+                .objectStore(this._store)
+                .openCursor();
 
             let negociacoes = [];
-                    
+
             cursor.onsuccess = e => {
+
                 let atual = e.target.result;
 
                 if(atual) {
@@ -51,20 +53,19 @@ class NegociacaoDao {
 
                     atual.continue();
 
-                } else { 
-
-                    // quando não há mais objects em nossa store.
-                    // Isso significa que já terminados de popular negociacoes
+                } else {
 
                     resolve(negociacoes);
                 }
+
             };
 
             cursor.onerror = e => {
+
                 console.log(e.target.error);
                 reject('Não foi possível listar as negociações');
             };
-    
+
         });
     }
 
